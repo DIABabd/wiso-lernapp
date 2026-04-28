@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WiSo Lern-App — IHK AP2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface2: #232333;
+    --border: #2e2e42;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --green: #00d084;
+    --yellow: #ffd166;
+    --red: #ff4757;
+    --text: #e8e8f0;
+    --muted: #7878a0;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow-x: hidden;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== HOME ===== */
+  #home {
+    background: radial-gradient(ellipse at top, #1a1040 0%, var(--bg) 60%);
+    padding: 40px 24px 24px;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .logo-tag {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    text-align: center;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .stat-box {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--accent);
+  }
+
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .btn-main {
+    width: 100%;
+    padding: 18px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .btn-main:active { transform: scale(0.97); opacity: 0.9; }
+
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-green { background: var(--green); color: #000; }
+
+  /* ===== STUDY ===== */
+  #study { background: var(--bg); }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .topbar-title {
+    font-weight: 700;
+    font-size: 16px;
+    flex: 1;
+  }
+
+  .topic-grid {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .topic-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .topic-card.open { border-color: var(--accent); }
+
+  .topic-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .topic-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .topic-name { font-weight: 600; font-size: 15px; flex: 1; }
+  .topic-chevron { color: var(--muted); transition: transform 0.2s; font-size: 18px; }
+  .topic-card.open .topic-chevron { transform: rotate(180deg); }
+
+  .topic-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .topic-card.open .topic-body { display: block; }
+
+  .fact-item {
+    display: flex;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .fact-item:last-child { border-bottom: none; }
+
+  .fact-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .fact-key { color: var(--yellow); font-weight: 600; }
+
+  /* ===== QUIZ ===== */
+  #quiz { background: var(--bg); }
+
+  .quiz-progress-bar {
+    height: 4px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .quiz-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+
+  .quiz-header {
+    padding: 16px 20px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .quiz-counter { font-size: 13px; color: var(--muted); }
+  .quiz-score-badge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .quiz-content { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+  .quiz-source {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .quiz-question {
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .quiz-hint {
+    font-size: 12px;
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.4;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .option-btn:active { transform: scale(0.99); }
+
+  .option-letter {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+
+  .option-btn.selected { border-color: var(--accent); background: rgba(108,99,255,0.12); }
+  .option-btn.selected .option-letter { background: var(--accent); color: white; }
+
+  .option-btn.correct { border-color: var(--green); background: rgba(0,208,132,0.1); }
+  .option-btn.correct .option-letter { background: var(--green); color: #000; }
+
+  .option-btn.wrong { border-color: var(--red); background: rgba(255,71,87,0.1); }
+  .option-btn.wrong .option-letter { background: var(--red); color: white; }
+
+  .option-btn:disabled { cursor: default; }
+
+  .check-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .check-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .feedback-box {
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .feedback-box.show { display: block; }
+  .feedback-box.correct-fb { background: rgba(0,208,132,0.12); border: 1px solid var(--green); }
+  .feedback-box.wrong-fb { background: rgba(255,71,87,0.12); border: 1px solid var(--red); }
+
+  .feedback-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .next-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+    margin-top: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .next-btn.show { display: block; }
+
+  /* ===== RESULTS ===== */
+  #results { background: var(--bg); padding: 40px 24px; align-items: center; gap: 20px; }
+
+  .result-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--accent);
+    background: rgba(108,99,255,0.1);
+    margin: 10px auto;
+  }
+
+  .result-percent {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .result-sub { font-size: 12px; color: var(--muted); }
+  .result-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; text-align: center; }
+
+  .wrong-list { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .wrong-item {
+    background: rgba(255,71,87,0.08);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: var(--radius);
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .wrong-item-q { font-weight: 600; margin-bottom: 4px; }
+  .wrong-item-a { color: var(--green); }
+  .wrong-section-title { font-weight: 700; color: var(--red); font-size: 14px; width: 100%; }
+
+  .btn-row { display: flex; gap: 10px; width: 100%; }
+  .btn-row .btn-main { flex: 1; }
+
+  /* ===== QUIZ FILTER ===== */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filter-chip {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .filter-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* multi select indicator */
+  .multi-hint {
+    font-size: 11px;
+    color: var(--accent2);
+    font-weight: 600;
+    padding: 0 20px 4px;
+  }
+
+  .confirm-multi-btn {
+    margin: 0 20px 8px;
+    padding: 14px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    width: calc(100% - 40px);
+  }
+  .confirm-multi-btn.show { display: block; }
+
+  /* ===== EXAM LIST ===== */
+  #exam-list { background: var(--bg); }
+  .exam-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex; gap: 14px; align-items: center;
+  }
+  .exam-card:active { transform: scale(0.98); }
+  .exam-card:hover { border-color: var(--accent); }
+  .exam-icon { width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0; }
+  .exam-info { flex: 1; }
+  .exam-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .exam-meta { font-size: 12px; color: var(--muted); }
+  .exam-arrow { color: var(--accent); font-size: 20px; }
+  #exam-quiz { background: var(--bg); }
+  #exam-results { background: var(--bg); padding: 40px 24px; align-items: center; gap: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ===== HOME ===== -->
+<div id="home" class="screen active">
+  <div class="logo-tag">IHK AP2 • FIAE • BREMEN</div>
+  <div class="hero-title">WiSo<br>Lern-App</div>
+  <p class="hero-sub">Alle wichtigen Themen + echte Prüfungsaufgaben aus 4 Prüfungen. Lerne wo und wann du willst.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-num">80+</div>
+      <div class="stat-label">Prüfungsfragen</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Prüfungsjahre</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">10</div>
+      <div class="stat-label">Themenblöcke</div>
+    </div>
+  </div>
+
+  <button class="btn-main btn-primary" onclick="showScreen('study')">📚 Themen lernen</button>
+  <button class="btn-main btn-secondary" onclick="startQuiz('all')">🎯 Quiz starten (alle)</button>
+  <button class="btn-main btn-secondary" onclick="showScreen('filter')">🔍 Quiz nach Thema filtern</button>
+  <button class="btn-main btn-secondary" onclick="showScreen('exam-list')" style="border-color:var(--accent);color:var(--accent);">📋 Prüfungen üben (Original-Aufgaben)</button>
+</div>
+
+<!-- ===== FILTER SCREEN ===== -->
+<div id="filter" class="screen" style="background:var(--bg)">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <div class="topbar-title">Quiz filtern</div>
+  </div>
+  <div style="padding:20px;color:var(--muted);font-size:14px;">Wähle ein oder mehrere Themen:</div>
+  <div id="filterChips" class="filter-row" style="flex-wrap:wrap; gap:8px; padding:0 20px 12px;"></div>
+  <div style="padding:0 20px;">
+    <button class="btn-main btn-primary" onclick="startFilteredQuiz()">Quiz starten</button>
+  </div>
+</div>
+
+<!-- ===== STUDY ===== -->
+<div id="study" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <div class="topbar-title">📚 Themen</div>
+  </div>
+  <div class="topic-grid" id="topicGrid"></div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz" class="screen">
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="quiz-header">
+    <div class="quiz-counter" id="quizCounter">Frage 1 / 20</div>
+    <div class="quiz-score-badge" id="scoreDisplay">✓ 0</div>
+  </div>
+  <div class="quiz-content">
+    <div class="quiz-source" id="qSource"></div>
+    <div class="quiz-question" id="qText"></div>
+    <div class="multi-hint" id="multiHint" style="display:none">⚡ Mehrere Antworten möglich — alle auswählen!</div>
+    <div class="options" id="optionsContainer"></div>
+    <button class="confirm-multi-btn" id="confirmMultiBtn" onclick="checkMultiAnswer()">Antwort prüfen ✓</button>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div id="feedbackText"></div>
+    </div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Nächste Frage →</button>
+  </div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="results" class="screen">
+  <div class="result-title">Ergebnis 🎓</div>
+  <div class="result-circle">
+    <div class="result-percent" id="resultPercent">0%</div>
+    <div class="result-sub" id="resultSub">0 / 0</div>
+  </div>
+  <div id="resultMessage" style="font-size:15px;text-align:center;color:var(--muted);"></div>
+
+  <div class="wrong-section-title" id="wrongTitle" style="display:none">❌ Falsch beantwortet:</div>
+  <div class="wrong-list" id="wrongList"></div>
+
+  <div class="btn-row">
+    <button class="btn-main btn-secondary" onclick="showScreen('home')">← Menü</button>
+    <button class="btn-main btn-green" onclick="retryWrong()" id="retryBtn">🔄 Falsche wiederholen</button>
+  </div>
+</div>
+
+
+<!-- ===== EXAM LIST ===== -->
+<div id="exam-list" class="screen" style="background:var(--bg);">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <div class="topbar-title">📋 Prüfungen üben</div>
+  </div>
+  <div style="padding:16px 20px 8px;font-size:13px;color:var(--muted);">Klicke eine Prüfung an:</div>
+  <div style="padding:8px 20px;display:flex;flex-direction:column;gap:12px;" id="examListContainer"></div>
+</div>
+
+<!-- ===== EXAM QUIZ ===== -->
+<div id="exam-quiz" class="screen">
+  <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="eProgressFill" style="width:0%"></div></div>
+  <div class="quiz-header">
+    <div class="quiz-counter" id="eQuizCounter">Aufgabe 1</div>
+    <div class="quiz-score-badge" id="eScoreDisplay">✓ 0</div>
+  </div>
+  <div class="quiz-content">
+    <div class="quiz-source" id="eQSource"></div>
+    <div class="quiz-question" id="eQText"></div>
+    <div class="multi-hint" id="eMultiHint" style="display:none">⚡ Mehrere Antworten möglich!</div>
+    <div class="options" id="eOptionsContainer"></div>
+    <button class="confirm-multi-btn" id="eConfirmMultiBtn" onclick="eCheckMultiAnswer()">Antwort prüfen ✓</button>
+    <div class="feedback-box" id="eFeedbackBox">
+      <div class="feedback-title" id="eFeedbackTitle"></div>
+      <div id="eFeedbackText"></div>
+    </div>
+    <button class="next-btn" id="eNextBtn" onclick="eNextQuestion()">Nächste Aufgabe →</button>
+  </div>
+</div>
+
+<!-- ===== EXAM RESULTS ===== -->
+<div id="exam-results" class="screen">
+  <div class="result-title">Prüfungsergebnis 🎓</div>
+  <div class="result-circle">
+    <div class="result-percent" id="eResultPercent">0%</div>
+    <div class="result-sub" id="eResultSub">0 / 0</div>
+  </div>
+  <div id="eResultMessage" style="font-size:15px;text-align:center;color:var(--muted);"></div>
+  <div class="wrong-section-title" id="eWrongTitle" style="display:none">❌ Falsch beantwortet:</div>
+  <div class="wrong-list" id="eWrongList"></div>
+  <div class="btn-row">
+    <button class="btn-main btn-secondary" onclick="showScreen('exam-list')">← Prüfungen</button>
+    <button class="btn-main btn-green" onclick="eRetryWrong()" id="eRetryBtn">🔄 Falsche wiederholen</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const TOPICS = [
+  {
+    id: 'bbig',
+    name: 'BBiG — Berufsbildungsgesetz',
+    icon: '📋',
+    color: '#6c63ff',
+    facts: [
+      { key: 'Probezeit', text: 'Mind. 1 Monat, max. 4 Monate. Kündigung ohne Angabe von Gründen und ohne Frist.' },
+      { key: 'Kündigung nach Probezeit', text: 'Azubi: Mit 4 Wochen Frist (z.B. um anderen Beruf zu beginnen). AG: Nur aus wichtigem Grund.' },
+      { key: 'Ausbildungsende', text: 'Endet mit Ablauf der Ausbildungszeit. Bei bestandener Prüfung VOR Ablauf → endet früher!' },
+      { key: 'Zeugnis', text: 'Einfaches Zeugnis (Dauer+Art) immer. Qualifiziertes Zeugnis (mit Bewertung) auf Verlangen des AN.' },
+      { key: 'Inhalt Ausbildungsvertrag', text: 'Pflicht: Beginn/Dauer, Ausbildungsberuf, Vergütung, Ausbildungsmaßnahmen, Probezeit. NICHT zwingend: Gleitzeit.' },
+      { key: 'Weiterbeschäftigung', text: 'Wenn AG nach bestandener Prüfung ohne Kündigung weiterbeschäftigt → automatisch unbefristetes Arbeitsverhältnis!' },
+    ]
+  },
+  {
+    id: 'betriebsrat',
+    name: 'Betriebsrat & BetrVG',
+    icon: '🏛️',
+    color: '#ff6584',
+    facts: [
+      { key: 'Betriebsrat vertritt', text: 'Die Interessen der ARBEITNEHMER — nicht Arbeitgeber, nicht IHK!' },
+      { key: 'Wählbar in Betriebsrat', text: 'Mind. 18 Jahre alt UND mind. 6 Monate im Betrieb beschäftigt. Kein Abschluss nötig!' },
+      { key: 'Mitbestimmung', text: 'Bei Pausenregelung, Urlaubsplan, Arbeitszeiten. NICHT bei Urlaubstagen (Tarifvertrag) oder Gehaltshöhe.' },
+      { key: 'Betriebsvereinbarung', text: 'Zwischen Betriebsrat und AG. Regelt: Pausenzeiten, Urlaubsplan, Arbeitszeiteinteilung.' },
+      { key: 'Sonderkündigungsschutz', text: 'Betriebsratsmitglieder, Schwerbehinderte, Schwangere/Mütter, Azubis in Ausbildung sind geschützt. NICHT: Mitarbeiter über 45 Jahre!' },
+    ]
+  },
+  {
+    id: 'jav',
+    name: 'JAV — Jugend- und Auszubildendenvertretung',
+    icon: '🎓',
+    color: '#ffd166',
+    facts: [
+      { key: 'Gesetz', text: 'Betriebsverfassungsgesetz (BetrVG) — NICHT BBiG oder JArbSchG!' },
+      { key: 'Aufgabe', text: 'Kann beim Betriebsrat Maßnahmen zugunsten der Auszubildenden BEANTRAGEN.' },
+      { key: 'Zusammenarbeit', text: 'Arbeitet mit Betriebsrat und Geschäftsführung zusammen.' },
+      { key: 'KEIN Stimmrecht', text: 'JAV hat KEIN Stimmrecht im Betriebsrat — nur beratende Funktion.' },
+    ]
+  },
+  {
+    id: 'jarbschg',
+    name: 'Jugendarbeitsschutzgesetz',
+    icon: '🧒',
+    color: '#00d084',
+    facts: [
+      { key: 'Gilt für', text: 'Jugendliche unter 18 Jahren.' },
+      { key: 'Max. Arbeitszeit', text: '8 Stunden/Tag, 40 Stunden/Woche.' },
+      { key: 'Ruhepause', text: 'Bei 4,5–6h Arbeit: 30 Min. Bei über 6h: 60 Min. Nicht länger als 4,5h ohne Pause!' },
+      { key: 'Ruhezeit', text: 'Zwischen Arbeitsende und nächstem Beginn: Mind. 12 Stunden.' },
+      { key: 'Urlaub', text: 'Unter 16: 30 Werktage. Unter 17: 27 Werktage. Unter 18: 25 Werktage.' },
+      { key: 'Arbeitszeit ab', text: 'Grundsätzlich nicht vor 6 Uhr und nicht nach 20 Uhr (Ausnahmen möglich).' },
+    ]
+  },
+  {
+    id: 'kuendigung',
+    name: 'Kündigung & §622 BGB',
+    icon: '📜',
+    color: '#ff9f43',
+    facts: [
+      { key: 'Arbeitnehmerkündigung', text: '4 Wochen zum 15. oder zum Ende des Monats. (unabhängig von Betriebszugehörigkeit!)' },
+      { key: '2 Jahre im Betrieb', text: '1 Monat zum Ende des Kalendermonats.' },
+      { key: '5 Jahre im Betrieb', text: '2 Monate zum Ende des Kalendermonats.' },
+      { key: '8 Jahre im Betrieb', text: '3 Monate.' },
+      { key: '10 Jahre im Betrieb', text: '4 Monate.' },
+      { key: '12 Jahre im Betrieb', text: '5 Monate.' },
+      { key: '15 Jahre im Betrieb', text: '6 Monate.' },
+      { key: '20 Jahre im Betrieb', text: '7 Monate.' },
+      { key: 'Merktrick', text: 'Jahre ÷ 2 + 0.5 ≈ Monate. Z.B. 10 Jahre → 4 Monate.' },
+    ]
+  },
+  {
+    id: 'sozialvers',
+    name: 'Sozialversicherung',
+    icon: '🏥',
+    color: '#54a0ff',
+    facts: [
+      { key: '5 Säulen', text: '1. Krankenversicherung 2. Rentenversicherung 3. Arbeitslosenversicherung 4. Pflegeversicherung 5. Unfallversicherung.' },
+      { key: 'Träger Unfallversicherung', text: 'BERUFSGENOSSENSCHAFT — nicht Krankenkasse, nicht Rentenversicherung!' },
+      { key: 'Unfallversicherung deckt', text: 'Arbeitsunfälle + Wegeunfälle (direkter Weg zur Arbeit). NICHT: Freizeitunfälle!' },
+      { key: 'Beitragsbemessungsgrenze', text: 'Auf Einkommensteil ÜBER der Grenze wird kein Beitrag mehr erhoben.' },
+      { key: 'KV-Beitrag berechnen', text: 'Bruttogehalt × (Allgemeiner Beitrag + Zusatzbeitrag) ÷ 2 = AN-Anteil. Bsp: 3500 × 16,4% ÷ 2 = 287 EUR.' },
+      { key: 'Sozialgericht', text: 'Für Streitigkeiten mit Krankenkasse, Rente, Arbeitsamt zuständig (nicht Arbeitsgericht!).' },
+    ]
+  },
+  {
+    id: 'rechtsformen',
+    name: 'Rechtsformen (GmbH & Co.)',
+    icon: '🏢',
+    color: '#5f27cd',
+    facts: [
+      { key: 'GmbH Stammkapital', text: 'Mindestens 25.000 EUR. Mind. 12.500 EUR bei Gründung einzuzahlen.' },
+      { key: 'GmbH Gründung', text: 'Durch eine oder mehrere Personen möglich. Eintragung ins Handelsregister Abteilung B.' },
+      { key: 'GmbH Haftung', text: 'Nur mit dem Gesellschaftsvermögen — KEINE persönliche Haftung der Gesellschafter!' },
+      { key: 'GmbH Gewinnverteilung', text: 'Nach Kapitalanteilen (nicht nach Köpfen!). Bsp: 35T von 120T = 29,2% → 29,2% des Gewinns.' },
+      { key: 'Handelsregister', text: 'GmbH → Abteilung B. Einzelkaufmann → Abteilung A.' },
+      { key: 'Sektor', text: 'Primär = Land/Forstwirtschaft. Sekundär = Industrie/Produktion. Tertiär = Dienstleistung (IT = TERTIÄR!).' },
+    ]
+  },
+  {
+    id: 'tarifvertrag',
+    name: 'Tarifvertrag & Streik',
+    icon: '⚖️',
+    color: '#ee5a24',
+    facts: [
+      { key: 'Tarifvertragsparteien', text: 'GEWERKSCHAFT (AN-Seite) + ARBEITGEBERVERBAND. NICHT Betriebsrat, nicht einzelne Firma!' },
+      { key: 'Lohn-/Gehaltstarifvertrag', text: 'Regelt: Gehaltssätze, Gehaltsgruppen. (kürzer laufend)' },
+      { key: 'Manteltarifvertrag', text: 'Regelt: Arbeitszeiten, Urlaub, Kündigungsfristen. (länger laufend)' },
+      { key: 'Betriebsvereinbarung vs. Tarifvertrag', text: 'Tarifvertrag geht vor! Betriebsvereinbarung nur wenn günstiger für AN.' },
+      { key: 'Streik', text: 'Gewerkschaft ruft zum Streik auf. AG-Gegenmittel: AUSSPERRUNG.' },
+      { key: 'Friedenspflicht', text: 'Während laufendem Tarifvertrag darf NICHT gestreikt werden!' },
+      { key: 'Änderung tariflicher Bedingungen', text: 'Nur wenn zugunsten der Arbeitnehmer!' },
+    ]
+  },
+  {
+    id: 'leitungssystem',
+    name: 'Leitungssysteme & Organisation',
+    icon: '🗂️',
+    color: '#10ac84',
+    facts: [
+      { key: 'Einliniensystem', text: 'Jeder MA hat NUR einen Vorgesetzten. Klare Struktur, langsam.' },
+      { key: 'Mehrliniensystem', text: 'MA hat mehrere Vorgesetzte (Fachspezialisten). Schneller, aber Kompetenzkonflikte.' },
+      { key: 'Stab-Liniensystem', text: 'Linie + Stabsstellen (beraten ohne Weisungsbefugnis). Bsp: Rechtsabteilung berät nur!' },
+      { key: 'Matrixorganisation', text: 'Doppelte Unterstellung: nach Funktion UND nach Projekt.' },
+      { key: 'Betriebliche Arbeitsteilung', text: 'Verschiedene Mitarbeiter für verschiedene Aufgaben IM Betrieb.' },
+    ]
+  },
+  {
+    id: 'wirtschaft',
+    name: 'Wirtschaft & Konjunktur',
+    icon: '📈',
+    color: '#fd9644',
+    facts: [
+      { key: 'Konjunktur beleben', text: 'Staatliche Investitionen erhöhen → belebt. Steuern erhöhen → dämpft. Leitzinsen erhöhen → dämpft.' },
+      { key: 'Soziale Marktwirtschaft', text: 'Freier Markt + sozialer Ausgleich + staatliche Kontrolle. Staat greift regulierend ein.' },
+      { key: 'Globalisierung', text: 'Wird gefördert durch: Offenheit für ausländische Investitionen, freien Handel. NICHT durch: Importzölle, Subventionen.' },
+      { key: 'Kartell', text: 'Unternehmen vereinbaren z.B. Preise, Gebiete, Quoten. Anmeldepflichtig: Gebietsaufteilung!' },
+      { key: 'Fusion', text: 'Vorteile: Rationalisierungen, breitere Kapitalbasis. Kontrolle durch Bundeskartellamt.' },
+      { key: 'Wirtschaftlichkeit', text: 'Ertrag ÷ Aufwand. Je HÖHER, desto wirtschaftlicher!' },
+      { key: 'Blauer Engel', text: 'Umweltzeichen: aus schadstoffarmen Rohstoffen, umweltschonend produziert.' },
+    ]
+  },
+];
+
+const QUESTIONS = [
+  // ===== WINTER 2025/26 =====
+  { id:1, src:'Winter 2025/26', topic:'bbig', q:'Welches Eignungskriterium muss ein Ausbilder nach dem BBiG erfüllen?', opts:['Mitgliedschaft im Arbeitgeberverband','Abschluss einer kaufmännischen Ausbildung','Persönliche und fachliche Eignung','Mitgliedschaft in einer Gewerkschaft','Mitgliedschaft im IHK-Prüfungsausschuss'], correct:[2], exp:'§30 BBiG: Ausbilder müssen persönlich und fachlich geeignet sein. Kein Verbandsbeitritt nötig!' },
+  { id:2, src:'Winter 2025/26', topic:'bbig', q:'Zur Verschwiegenheitspflicht (§13 BBiG): Welche Aussage ist zutreffend?', opts:['Auszubildende müssen über ALLES Stillschweigen wahren','Auszubildende müssen über Betriebs- und Geschäftsgeheimnisse Stillschweigen wahren','Pflicht muss jährlich schriftlich bestätigt werden','Dürfen außerhalb des Betriebs nicht mit anderen sprechen','Keine Verschwiegenheitspflicht gegenüber Lebenspartnern'], correct:[1], exp:'§13 Nr.6 BBiG: Nur Betriebs- und Geschäftsgeheimnisse — nicht alles!' },
+  { id:3, src:'Winter 2025/26', topic:'bbig', q:'Welche ZWEI Formulierungen entsprechen dem BBiG?', opts:['In Probezeit nur mit 4 Wochen Frist kündbar','Azubi kann kündigen um anderen Beruf zu beginnen','Vereinbarungen über Entschädigungszahlung an AG','Ausbildung endet mit Ablauf der Zeit auch bei früherem Bestehen','Auf Wunsch muss Zeugnis ausgestellt werden','AG muss nach Bestehen unbefristeten Vertrag anbieten'], correct:[1,4], exp:'Kündigung für anderen Beruf ist laut BBiG erlaubt. Zeugnis muss auf Verlangen ausgestellt werden.' },
+  { id:4, src:'Winter 2025/26', topic:'bbig', q:'Azubi wird nach bestandener Prüfung ohne Absprache weiterbeschäftigt. Was passiert?', opts:['Es wird ein unbefristetes Arbeitsverhältnis begründet','Beschäftigung kann jederzeit ohne Kündigung beendet werden','Beschäftigung endet automatisch nach 12 Monaten','Endet zum Ende des nächsten Quartals','Probezeit von 6 Monaten beginnt'], correct:[0], exp:'§24 BBiG: Wird Azubi nach Ausbildung ohne Vereinbarung weiterbeschäftigt → automatisch unbefristetes AV!' },
+  { id:5, src:'Winter 2025/26', topic:'wirtschaft', q:'Welche Maßnahme belebt die Konjunktur?', opts:['Erhöhung staatlicher Investitionen','Erhöhung der Steuern','Erhöhung der Leitzinsen','Kürzung des Kindergeldes','Kürzung des Arbeitslosengeldes'], correct:[0], exp:'Staatliche Investitionen = mehr Nachfrage = mehr Produktion = Konjunktur belebt!' },
+  { id:6, src:'Winter 2025/26', topic:'wirtschaft', q:'Bei welchen Unternehmenszielen besteht ein Zielkonflikt?', opts:['Chancengleichheit + Kantine renovieren','Gewinnbeteiligung + Betriebsklima verbessern','Personalkosten sparen + Arbeitsplätze sichern','Betriebsklima verbessern + mobiles Arbeiten erweitern','E-Mobilität + Papierverbrauch senken'], correct:[2], exp:'Personalkosten sparen (weniger MA) widerspricht Arbeitsplätze sichern — klassischer Zielkonflikt!' },
+  { id:7, src:'Winter 2025/26', topic:'bbig', q:'Welche Aussage zur Probezeit im Ausbildungsvertrag ist richtig?', opts:['Kündigungen in Probezeit sind unzulässig','Probezeit muss mind. 1 und max. 4 Monate dauern','Azubi ist von Berufsschulpflicht befreit','Probezeit kann 6 Monate betragen','Probezeit muss nicht vereinbart werden'], correct:[1], exp:'§20 BBiG: Probezeit = mindestens 1 Monat, höchstens 4 Monate.' },
+  { id:8, src:'Winter 2025/26', topic:'jav', q:'Welches Gesetz enthält Regelungen zur JAV?', opts:['Bürgerliches Gesetzbuch','Arbeitsschutzgesetz','Berufsbildungsgesetz','Jugendarbeitsschutzgesetz','Betriebsverfassungsgesetz'], correct:[4], exp:'JAV = Teil des BetrVG (Betriebsverfassungsgesetz), §§60-73!' },
+  { id:9, src:'Winter 2025/26', topic:'jav', q:'Als JAV-Mitglied... welche Aussage trifft zu?', opts:['Darf man nur 2x/Jahr an Betriebsratssitzungen teilnehmen','Darf man beim Betriebsrat Maßnahmen zugunsten Azubis beantragen','Vertritt man Interessen aller Jugendlichen gegenüber Geschäftsführung','Muss man vor JEDER Entscheidung des Betriebsrats gehört werden','Hat man bei allen Belangen ein Mitspracherecht'], correct:[1], exp:'JAV BEANTRAGT Maßnahmen beim Betriebsrat — sie entscheidet nicht selbst!' },
+  { id:10, src:'Winter 2025/26', topic:'betriebsrat', q:'Voraussetzung für die Wahl in den Betriebsrat?', opts:['Muss das 25. Lebensjahr vollendet haben','Jeder der das 16. Lebensjahr vollendet hat','Volljährig + mind. 6 Monate im Betrieb','Muss abgeschlossene Berufsausbildung haben','17 Jahre + max. 6 Monate vorher beschäftigt'], correct:[2], exp:'§8 BetrVG: Wählbar ist, wer 18 Jahre alt ist und mind. 6 Monate dem Betrieb angehört.' },
+  { id:11, src:'Winter 2025/26', topic:'jarbschg', q:'Welche JArbSchG-Regelung gilt für Jugendliche unter 18?', opts:['Max. 5 Stunden ununterbrochen ohne Pause','Ruhezeit mind. 10 Stunden zwischen Arbeitstagen','Wöchentliche Arbeitszeit von 40 Stunden zulässig','Grundsätzlich nicht vor 8 Uhr morgens','2 Tage vor Prüfung freigestellt'], correct:[2], exp:'§8 JArbSchG: Max. 40 Stunden/Woche, max. 8 Stunden/Tag. Ruhezeit = 12 Stunden (nicht 10).' },
+  { id:12, src:'Winter 2025/26', topic:'bbig', q:'Welches Beispiel ist eine berufliche FORTBILDUNG?', opts:['Realschüler besucht Berufsfachschule für kfm. Assistenten','Azubi nimmt an überbetrieblichem IT-Sicherheitslehrgang teil','Frau Monion besucht VHS Segelkurs','Azubi mit Abitur möchte nach Ausbildung studieren','Anja Bertsch nimmt Fernlehrgang Business English nach Ausbildung teil'], correct:[4], exp:'Fortbildung = NACH der Ausbildung zur Vertiefung. Fernlehrgang Business English nach Ausbildung = Fortbildung!' },
+  { id:13, src:'Winter 2025/26', topic:'tarifvertrag', q:'Unbefristeter Streik: Welche Aussage ist zutreffend?', opts:['Nur möglich wenn DGB-Bundesvorstand zustimmt ohne Urabstimmung','Muss vom Bundesministerium genehmigt werden','Ist nur vor Auslaufen eines Tarifvertrags möglich','Begleitet immer Tarifverhandlungen','Arbeitgeber können mit Aussperrung reagieren'], correct:[4], exp:'Auf einen Streik können Arbeitgeber mit AUSSPERRUNG reagieren — das ist das AG-Kampfmittel!' },
+  { id:14, src:'Winter 2025/26', topic:'kuendigung', q:'Carl Kosta arbeitet seit 01.01.2012. Er kündigt am 11.12.2025. Wann endet sein AV? (gesetzliche Frist)', opts:['31.12.2025','31.01.2026','28.02.2026','31.03.2026','30.04.2026'], correct:[3], exp:'Seit 2012 bis Ende 2025 = ~13 Jahre → §622: 5 Monate Frist. Kündigung am 11.12. → Frist ab 01.01.2026 → Ende: 31.05.2026. Aber: AN-Kündigung = 4 Wochen zum 15. oder Monatsende → 11.12 → 31.12.2025... Korrektur: Kosta kündigt SELBST → AN-Frist: 4 Wochen zum 15. oder Monatsende → nächster Termin nach 4 Wochen ab 11.12 = 08.01 → zum 31.01.2026!', exp:'Bei Eigenkündigung des AN gilt §622 Abs.1: 4 Wochen zum 15. oder zum Monatsende. 11.12+4W = 08.01.2026 → zum 31.01.2026.' },
+  { id:15, src:'Winter 2025/26', topic:'bbig', q:'Das qualifizierte Zeugnis... welcher Sachverhalt trifft zu?', opts:['Enthält nur Art und Dauer der Beschäftigung','Darf auch private Auftreten beinhalten','Wird auf Ermessen des AG ausgestellt','Wird nur bei sehr guten Leistungen ausgestellt','Muss nur auf Verlangen des AN ausgestellt werden'], correct:[4], exp:'Das qualifizierte Zeugnis muss auf VERLANGEN ausgestellt werden — AG stellt es nicht automatisch aus!' },
+  { id:16, src:'Winter 2025/26', topic:'betriebsrat', q:'Welches Arbeitsverhältnis kann durch ordentliche Kündigung beendet werden? (KSchG beachten)', opts:['Dan Schulze, 19J., Azubi im 2. Lehrjahr','Kevin Behrens, 32J., 5 Jahre im Unternehmen, ledig, keine Kinder','David Zolt, 35J., schwerbehindert, 10 Jahre im Unternehmen','Luisa Nova, 28J., im 5. Monat schwanger','Till Svensson, 38J., Betriebsratsmitglied'], correct:[1], exp:'Kevin Behrens hat keinen besonderen Schutz (kein Sonderkündigungsschutz). Die anderen sind geschützt: Azubi, Schwerbehindert, Schwanger, Betriebsrat.' },
+  { id:17, src:'Winter 2025/26', topic:'rechtsformen', q:'GmbH-Gründung: Welche Regelung trifft zu?', opts:['Mind. 3 Personen für GmbH-Gründung','Nur durch Sacheinlagen gründbar','Persönliche Mitarbeit aller Gesellschafter verpflichtend','GmbH muss ins Handelsregister eingetragen werden','Stammkapital 50.000 EUR muss vollständig eingezahlt werden'], correct:[3], exp:'GmbH MUSS ins Handelsregister (Abt. B) eingetragen werden. Stammkapital = 25.000 EUR (nicht 50.000)!' },
+  { id:18, src:'Winter 2025/26', topic:'rechtsformen', q:'Frau Wegener (35.000€) und Herr Traut (85.000€) gründen GmbH. Welcher Sachverhalt trifft zu?', opts:['Nur Frau Wegener konnte Eintragung beantragen','Neues Unternehmen könnte unter anderem Namen firmieren','Frau Wegener kann als Gesellschafterin Geschäftsführung übernehmen','Einlagen = mehr als 10-faches des Stammkapitals','Mündlicher Gesellschaftsvertrag reicht'], correct:[2], exp:'Gesellschafter einer GmbH können auch die Geschäftsführung übernehmen. Gesellschaftsvertrag muss NOTARIELL beurkundet sein!' },
+  { id:19, src:'Winter 2025/26', topic:'rechtsformen', q:'Gewinn 60.000 EUR, keine Gewinnregelung. Wegener hat 35.000€, Traut 85.000€. Wegeners Anteil?', opts:['15.000 EUR','17.500 EUR','20.000 EUR','25.000 EUR','30.000 EUR'], correct:[1], exp:'Wegener: 35.000 / (35.000+85.000) = 35.000/120.000 = 29,17%. 60.000 × 29,17% = 17.500 EUR.' },
+  { id:20, src:'Winter 2025/26', topic:'betriebsrat', q:'Gegen das AGG verstoßen — welche ZWEI Fälle?', opts:['"Junge Mitarbeiter (m/w/d)" in Stellenanzeige','Abmahnung wegen Rauchens trotz Verbots','Keine Pause bei 4-Stunden-Tag (volljährig)','Ablehnung wegen dunkler Hautfarbe','Schwerbehinderter erhält 5 Extra-Urlaubstage','Bewerber abgelehnt wegen fehlender PC-Kenntnisse'], correct:[0,3], exp:'AGG verbietet Diskriminierung nach Alter ("jung") und Rasse/ethnischer Herkunft (Hautfarbe).' },
+  { id:21, src:'Winter 2025/26', topic:'leitungssystem', q:'Betriebliche Arbeitsteilung — welcher Fall trifft zu?', opts:['3 Informatiker für App-Prog., Softwarewartung, Schulung','Bildschirme von chinesischem Anbieter beziehen','Software aber keine Smartphones anbieten','Selfiesticks mit Firmenlogo versehen lassen','Frauenquote einführen'], correct:[0], exp:'Betriebliche (innerbetriebliche) Arbeitsteilung = verschiedene MA für verschiedene Aufgaben IM Betrieb.' },
+  { id:22, src:'Winter 2025/26', topic:'leitungssystem', q:'Das Organigramm zeigt: Leitung → Fertigung, Vertrieb, Beschaffung → Unterbereiche. Welches Leitungssystem?', opts:['Einliniensystem','Stab-Liniensystem','Mehrliniensystem','Matrixorganisation','Spartenorganisation'], correct:[0], exp:'Jede Stelle hat genau einen Vorgesetzten = Einliniensystem!' },
+  { id:23, src:'Winter 2025/26', topic:'leitungssystem', q:'Stabsstellen im Organigramm: Welche Aussage trifft zu?', opts:['Fertigung und Vertrieb sind Stabsstellen','Stabsstellen kommen auf keiner Ebene vor','Einkauf untersteht Vertrieb','Leitung der Fertigung nicht an GF-Weisungen gebunden','Rechtsabteilung berät GF, hat keine Weisungsbefugnis'], correct:[4], exp:'Stabsstellen (z.B. Rechtsabteilung) beraten nur — sie haben KEINE Weisungsbefugnis!' },
+  { id:24, src:'Winter 2025/26', topic:'sozialvers', q:'Bruttogehalt 3.500 EUR. KV-Beitrag 14,6% + Zusatzbeitrag 1,8%. AN-Beitrag zur KV?', opts:['257,60 EUR','270,00 EUR','287,00 EUR','574,00 EUR','320,00 EUR'], correct:[2], exp:'(14,6% + 1,8%) = 16,4%. ÷ 2 = 8,2% AN-Anteil. 3.500 × 8,2% = 287 EUR.' },
+  { id:25, src:'Winter 2025/26', topic:'wirtschaft', q:'Welche Maßnahme fördert die Globalisierung?', opts:['Erhöhung von Importzöllen','Einschränkung des Technologietransfers','Subventionierung niedriger Preise','Offenheit für Investitionen ausländischer Unternehmen','Erhöhung der Produktionstiefe an Industriestandorten'], correct:[3], exp:'Globalisierung = offene Märkte, freier Austausch. Importzölle und Subventionen hemmen Globalisierung!' },
+  { id:26, src:'Winter 2025/26', topic:'wirtschaft', q:'Soziale Marktwirtschaft — welche Aussage trifft zu?', opts:['Staat fördert Monopole und Kartelle','Staat setzt Mindest- und Höchstpreise fest','Sozialer Ausgleich soll Chancengleichheit erreichen','Alle Wettbewerbshemmnisse werden vermieden','Insolvenzbedrohte Firmen werden immer staatlich gestützt'], correct:[2], exp:'Soziale Marktwirtschaft = freier Markt + sozialer Ausgleich + Wettbewerbsschutz.' },
+  { id:27, src:'Winter 2025/26', topic:'wirtschaft', q:'Fusion: Welche ZWEI Auswirkungen sind möglich?', opts:['Rationalisierungen und Einsparungen','Breitere Kapitalbasis und bessere Finanzierung','Anspruch auf Marktbereinigungsprämie der EU','Aufsicht durch Bundeswirtschaftsministerium','Geringere Umsatzsteuer','Verpflichtung zur Rechtsformänderung'], correct:[0,1], exp:'Fusionen ermöglichen Kostenersparnisse (Rationalisierung) und stärken die Finanzkraft (breitere Kapitalbasis).' },
+  { id:28, src:'Winter 2025/26', topic:'wirtschaft', q:'"Blauer Engel" — welche Aussage trifft zu?', opts:['Ware ist besonders haltbar','Ware ist besonders sicher in Handhabung','Aus schadstoffarmen Rohstoffen und umweltschonend produziert','Hat mehrere Umweltpreise gewonnen','Muss über Duales System entsorgt werden'], correct:[2], exp:'Blauer Engel = Umweltzeichen für umweltschonende Produktion und schadstoffarme Rohstoffe.' },
+
+  // ===== SOMMER 2024 =====
+  { id:29, src:'Sommer 2024', topic:'bbig', q:'Probezeit in Ausbildungsverträgen — welche Aussage trifft zu?', opts:['Probezeit ist nicht erforderlich','Muss mind. 6 Monate betragen','Nur bei kaufmännischen Berufen erforderlich','Mind. 1 Monat, max. 4 Monate','Ab 1 Monat nur bei 3-jähriger Ausbildung'], correct:[3], exp:'§20 BBiG: Probezeit = mind. 1 Monat, max. 4 Monate. Gilt für ALLE Ausbildungsberufe!' },
+  { id:30, src:'Sommer 2024', topic:'bbig', q:'Frau Medstein möchte Ausbildung abbrechen und Verwaltungsangestellte werden. Welche Aussage trifft zu?', opts:['Kündigungsfrist = 6 Monate für beide','Frau Medstein kann mit 4 Wochen Frist kündigen','Nach Probezeit kann der Vertrag nicht mehr gekündigt werden','Nach Probezeit kann nur der Betrieb kündigen','Nur mit IHK-Zustimmung kündbar'], correct:[1], exp:'§22 BBiG: Nach Probezeit kann Azubi mit 4 Wochen Frist kündigen, wenn anderer Ausbildungsberuf angestrebt.' },
+  { id:31, src:'Sommer 2024', topic:'bbig', q:'Ausbildungsverhältnis endet — welche Aussage trifft zu?', opts:['Azubi muss nach Prüfung kündigen','Betrieb muss nach Prüfung kündigen','Endet vor Ablauf der Zeit bei bestandener Prüfung','Kann nur von zuständiger Stelle (IHK) beendet werden','Endet mit Beendigung der Berufsschulpflicht'], correct:[2], exp:'§21 BBiG: Das Ausbildungsverhältnis endet bei bestandener Prüfung VOR Ablauf der Ausbildungszeit!' },
+  { id:32, src:'Sommer 2024', topic:'bbig', q:'Befristetes Arbeitsverhältnis für 1 Jahr — welche Aussage trifft zu?', opts:['Azubi kann nur in befristetes AV übernommen werden','AV endet nach 1 Jahr ohne Kündigung','Befristung nur mit Zustimmung der Agentur für Arbeit','Muss auf mind. 2 Jahre abgeschlossen werden','Befristetes AV nur mit BR-Zustimmung möglich'], correct:[1], exp:'Befristetes AV endet automatisch zum vereinbarten Datum — KEINE Kündigung nötig!' },
+  { id:33, src:'Sommer 2024', topic:'betriebsrat', q:'Welche ZWEI Sachverhalte können durch Betriebsvereinbarung geregelt werden?', opts:['Einführung neuer Pausenregelung','Reduzierung der Urlaubstage gemäß Tarifvertrag','Höhe der Arbeitsentgelte nach Gehaltsgruppen','Aufstellung des Urlaubsplans','Erhöhung der Arbeitszeit auf 11 Stunden','Entgeltfortzahlung im Krankheitsfall'], correct:[0,3], exp:'Betriebsvereinbarung: Pausenregelung (1) und Urlaubsplan (4). Urlaubsdauer = Tarifvertrag, Gehaltshöhe = Tarifvertrag!' },
+  { id:34, src:'Sommer 2024', topic:'betriebsrat', q:'Wessen Interessen vertritt der Betriebsrat?', opts:['Arbeitgeber','Arbeitnehmer','Leitende Angestellte','Industrie- und Handelskammern','Bundesagentur für Arbeit'], correct:[1], exp:'Betriebsrat = Interessenvertretung der ARBEITNEHMER!' },
+  { id:35, src:'Sommer 2024', topic:'sozialvers', q:'Krankenversicherungsstreit um Zuzahlung: Bei welchem Gericht muss Klage eingereicht werden?', opts:['Amtsgericht','Landgericht','Arbeitsgericht','Sozialgericht','Finanzgericht'], correct:[3], exp:'Streitigkeiten mit Kranken-, Renten- oder Arbeitslosenversicherung → SOZIALGERICHT!' },
+  { id:36, src:'Sommer 2024', topic:'sozialvers', q:'Beitragsbemessungsgrenze — welche Aussage trifft zu?', opts:['Gibt an wie hoch mindestens die Rente ist','Auf Teil über BBG wird kein Beitrag mehr erhoben','Bei Verdienst über BBG: keine Versicherungspflicht in KV mehr','Wer über BBG verdient muss privat vorsorgen','Kein Anspruch auf Erwerbsminderungsrente über BBG'], correct:[1], exp:'Auf den Einkommensteil ÜBER der Beitragsbemessungsgrenze wird KEIN Sozialversicherungsbeitrag erhoben.' },
+  { id:37, src:'Sommer 2024', topic:'rechtsformen', q:'IT-Dienstleistungsunternehmen — welche ZWEI Bezeichnungen treffen zu?', opts:['Unternehmen des primären Sektors','Unternehmen des sekundären Sektors','Unternehmen des tertiären Sektors','Erwerbswirtschaftlicher Betrieb','Gemeinwirtschaftlicher Betrieb','Personengesellschaft'], correct:[2,3], exp:'IT = Dienstleistung = TERTIÄRER Sektor. GmbH mit Gewinnziel = ERWERBSWIRTSCHAFTLICH!' },
+  { id:38, src:'Sommer 2024', topic:'betriebsrat', q:'Arbeitsschutzausschuss: Welche Aussage trifft zu?', opts:['Mitbestimmung der AN ist ausgeschlossen','Arbeitsschutzbestimmungen sind kein zwingendes Recht','Betrieb mit mehr als 20 MA muss Arbeitsschutzausschuss einrichten','Ergonomie ist keine Pflicht','Unterweisung durch externe Gewerkschaftsberater'], correct:[2], exp:'§11 ASiG: Betriebe mit mehr als 20 Beschäftigten müssen einen Arbeitsschutzausschuss einrichten!' },
+  { id:39, src:'Sommer 2024', topic:'sozialvers', q:'Gesetzliche Unfallversicherung — welche ZWEI Fälle sind abgedeckt?', opts:['Mitarbeiterin stürzt im Lager und bricht Fuß','MA stürzt in Freizeit (Schulter)','Auszubildende rutscht auf direktem Weg zur Arbeit aus','MA wegen Magenerkrankung arbeitsunfähig','Tochter erkrankt','MA sucht Augenarzt auf (Verschlechterung Sehkraft)'], correct:[0,2], exp:'Unfallversicherung: Arbeitsunfälle (im Betrieb) + Wegeunfälle (direkter Weg zur Arbeit/zurück). Freizeitunfälle: NEIN!' },
+  { id:40, src:'Sommer 2024', topic:'sozialvers', q:'Träger der gesetzlichen Unfallversicherung?', opts:['Deutsche Rentenversicherung','Gewerbeaufsichtsamt','Berufsgenossenschaft','Gesetzliche Krankenversicherung','Private Krankenkasse'], correct:[2], exp:'BERUFSGENOSSENSCHAFT ist der Träger der gesetzlichen Unfallversicherung!' },
+  { id:41, src:'Sommer 2024', topic:'rechtsformen', q:'GmbH-Informationen aus Handelsregistereintrag. Aus welcher Quelle stammen diese?', opts:['Grundbuch','Patentregister','Gesellschaftsvertrag','Handelsregister','Vereinsregister'], correct:[3], exp:'GmbH-Daten (Gesellschafter, Stammkapital, Prokura) stehen im HANDELSREGISTER.' },
+  { id:42, src:'Sommer 2024', topic:'rechtsformen', q:'GmbH hat zwei Gesellschafter: Peter (198.000€) und Claudia (Rest von 330.000€). Gewinn: 87.450€. Claudias Anteil?', opts:['25.000 EUR','29.000 EUR','34.980 EUR','40.000 EUR','52.450 EUR'], correct:[2], exp:'Claudia: 330.000-198.000=132.000€. Anteil: 132.000/330.000=40%. 87.450×40%=34.980 EUR.' },
+  { id:43, src:'Sommer 2024', topic:'rechtsformen', q:'Welche Aussage über die GmbH trifft zu?', opts:['GmbH ist Personengesellschaft','Eintragung in HRA','Gründung durch eine Person möglich','Mindeststammkapital 5.000 EUR','Nur ein Geschäftsführer möglich'], correct:[2], exp:'GmbH kann durch eine einzige Person gegründet werden (Ein-Mann-GmbH). Stammkapital = 25.000 EUR, Eintragung in HRB.' },
+  { id:44, src:'Sommer 2024', topic:'wirtschaft', q:'Businessplan — welche Aussage trifft zu?', opts:['Wird von zuständiger IHK ausgestellt','Im Handelsregister eingetragen','Nur bei Kapitalgesellschaften nötig','Für Bankfinanzierung notwendig','Enthält Finanzkonzept und Unternehmensidee'], correct:[4], exp:'Im Businessplan werden Finanzkonzept, Unternehmensidee, Marktanalyse etc. vorgestellt.' },
+  { id:45, src:'Sommer 2024', topic:'wirtschaft', q:'Welcher Auftrag wurde am wirtschaftlichsten abgewickelt? (Aufwand/Ertrag: A1: 600/720, A2: 320/400, A3: 160/208, A4: 200/248)', opts:['Auftrag 1','Auftrag 2','Auftrag 3','Auftrag 4'], correct:[2], exp:'Wirtschaftlichkeit = Ertrag÷Aufwand. A1=1,20, A2=1,25, A3=1,30, A4=1,24. Auftrag 3 am höchsten!' },
+  { id:46, src:'Sommer 2024', topic:'leitungssystem', q:'Organigramm zeigt Leitung → 3 Abteilungen → je 3 Unterbereiche. Welches Leitungssystem?', opts:['Einliniensystem','Matrixsystem','Mehrliniensystem','Stabliniensystem','Abteilungssystem'], correct:[0], exp:'Jede Stelle hat genau EINEN Vorgesetzten = EINLINIENSYSTEM.' },
+  { id:47, src:'Sommer 2024', topic:'wirtschaft', q:'Welches Kartell ist anmeldepflichtig?', opts:['Kartellmitglieder vereinbaren Mindestpreis','Vereinbaren einheitliche Abmessungen (Normen)','Vereinbaren vertraglich Absatzgebiete','Kartellvertrag für Produktionsquoten','Vereinbaren Höchstpreis'], correct:[2], exp:'Gebietskartelle (Aufteilung von Absatzgebieten) sind anmeldepflichtig beim Bundeskartellamt.' },
+  { id:48, src:'Sommer 2024', topic:'betriebsrat', q:'Wer genießt KEINEN besonderen Kündigungsschutz?', opts:['Betriebsratsmitglieder','Schwerbehinderte','Werdende Mütter','Mitarbeiter über 45 Jahre','Auszubildende nach der Probezeit'], correct:[3], exp:'Mitarbeiter über 45 haben KEINEN besonderen Kündigungsschutz. Alle anderen auf der Liste sind geschützt!' },
+  { id:49, src:'Sommer 2024', topic:'tarifvertrag', q:'Lohn- und Gehaltstarifvertrag regelt typischerweise:', opts:['Kündigungsfristen','Tägliche/wöchentliche Arbeitszeit','Mindesturlaub','Gehaltssätze für Gehaltsgruppen','Arbeitsbefreiung für IHK-Prüfungen'], correct:[3], exp:'Lohn-/Gehaltstarifvertrag = GEHALTSSÄTZE. Arbeitszeit, Urlaub, Kündigungsfristen = Manteltarifvertrag!' },
+  { id:50, src:'Sommer 2024', topic:'tarifvertrag', q:'Welche Aussage zu Tarifverträgen trifft zu?', opts:['Arbeitgeberverbände und Gewerkschaften handeln aus','Streiks sind während Laufzeit erlaubt (4 Wochen Ankündigung)','Werden zwischen Geschäftsführung und Arbeitnehmern geschlossen','Sind als Empfehlungen zu interpretieren','Arbeitskampfmaßnahmen müssen vorausgehen'], correct:[0], exp:'Tarifverträge werden zwischen ARBEITGEBERVERBÄNDEN und GEWERKSCHAFTEN ausgehandelt — nicht direkt Firma+MA!' },
+
+  // ===== WINTER 2024/25 =====
+  { id:51, src:'Winter 2024/25', topic:'jarbschg', q:'Monion (17J., geb. 02.03.) beginnt Ausbildung 01.08.2024. Wie viele Werktage Urlaub erhält er 2025 mehr als JArbSchG Minimum?', opts:['0 Werktage','2 Werktage','3 Werktage','5 Werktage','7 Werktage'], correct:[2], exp:'Monion ist am 02.03.2025 noch 17 → mind. 27 Werktage. Er erhält 30. Differenz = 3 Werktage.' },
+  { id:52, src:'Winter 2024/25', topic:'bbig', q:'Was ist NICHT zwingend im Ausbildungsvertrag festzuhalten?', opts:['Art und Gliederung sowie Ziel der Ausbildung','Beginn und Dauer der Ausbildung','Dauer der täglichen Ausbildungszeit','Regelungen zur Gleitzeit','Ausbildungsmaßnahmen außerhalb der Ausbildungsstätte'], correct:[3], exp:'§11 BBiG: Gleitzeit ist NICHT zwingend. Beginn/Dauer, Ausbildungsberuf, Vergütung usw. sind Pflicht.' },
+  { id:53, src:'Winter 2024/25', topic:'bbig', q:'Probezeit: Wie lang muss sie laut BBiG MINDESTENS sein?', opts:['1 Monat','2 Monate','3 Monate','4 Monate','Probezeit ist nicht zwingend'], correct:[0], exp:'§20 BBiG: Probezeit mindestens 1 Monat, höchstens 4 Monate.' },
+  { id:54, src:'Winter 2024/25', topic:'bbig', q:'Kündigung während Probezeit — was entspricht dem BBiG?', opts:['Kündigung kann mündlich erfolgen','Beide Seiten können nur in erster Hälfte der Probezeit kündigen','Beide Seiten können ohne Grund und ohne Kündigungsfrist kündigen','Betriebsrat muss jeder AG-Kündigung in Probezeit zustimmen','AG kann in Probezeit nicht kündigen'], correct:[2], exp:'§22 BBiG: In der Probezeit kann jederzeit, ohne Frist und ohne Angabe von Gründen gekündigt werden!' },
+  { id:55, src:'Winter 2024/25', topic:'betriebsrat', q:'Wer ist in den Betriebsrat WÄHLBAR? (passives Wahlrecht)', opts:['Alle über 16 Jahre','Alle Betriebsangehörigen','Alle die 18 Jahre alt sind und mind. 6 Monate im Betrieb','Alle die 21 Jahre alt sind und mind. 1 Monat im Betrieb','Alle die mind. 6 Wochen dem Betrieb angehören'], correct:[2], exp:'§8 BetrVG: Wählbar ab 18 Jahren + mind. 6 Monate Betriebszugehörigkeit.' },
+  { id:56, src:'Winter 2024/25', topic:'tarifvertrag', q:'Gewerkschaften — welche Aussage trifft zu?', opts:['Schlichten Auseinandersetzungen direkt im Betrieb','Handeln Betriebsvereinbarungen mit AG-Verbänden aus','Können bei Streitigkeiten Rechtsbeistand leisten','Haben Aufgabe Betriebsratswahlen zu kontrollieren','Treten für Belange ALLER Arbeitnehmer ein (auch Nicht-Mitglieder)'], correct:[2], exp:'Gewerkschaften können ihren Mitgliedern Rechtsbeistand leisten.' },
+  { id:57, src:'Winter 2024/25', topic:'tarifvertrag', q:'Tarifliche Arbeitsbedingungen sollen geändert werden. Wann ist das zulässig?', opts:['Wenn zugunsten der Arbeitnehmer','Wenn Berufsgenossenschaft zustimmt','Wenn Landesregierung zustimmt','Wenn zugunsten des Unternehmens','Wenn Bundesagentur für Arbeit genehmigt'], correct:[0], exp:'Abweichungen vom Tarifvertrag sind nur erlaubt wenn sie GÜNSTIGER für die Arbeitnehmer sind (Günstigkeitsprinzip)!' },
+  { id:58, src:'Winter 2024/25', topic:'tarifvertrag', q:'In der Tarifrunde — Tarifvertrag läuft. Darf gestreikt werden?', opts:['Ja, immer wenn Gewerkschaft es beschließt','Ja, mit 4 Wochen Vorankündigung','Nein, Friedenspflicht gilt während der Laufzeit','Nur wenn DGB-Bundesvorstand zustimmt','Ja, nach Urabstimmung der Mitglieder'], correct:[2], exp:'Friedenspflicht: Während eines laufenden Tarifvertrags darf NICHT gestreikt werden!' },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+
+let currentScreen = 'home';
+let quizQuestions = [];
+let currentQ = 0;
+let score = 0;
+let wrongAnswers = [];
+let selectedAnswers = [];
+let answered = false;
+let selectedFilters = [];
+
+
+// ============================================================
+// EXAM DATA
+// ============================================================
+const EXAMS = [
+  {
+    id:'w2122', title:'Winter 2021/22', subtitle:'MÖLLER AG · 28 Aufgaben', icon:'❄️', color:'#54a0ff',
+    questions:[
+      {nr:1,q:'Die MÖLLER AG ist IT-Dienstleister. Aktionäre sind Privatpersonen, die Dividenden erwarten. Welche ZWEI Angaben treffen zu?',opts:['Unternehmen des primären Sektors','Unternehmen des tertiären Sektors','Erwerbswirtschaftliches Unternehmen','Gemeinwirtschaftliches Unternehmen','Personengesellschaft','Gesellschaft bürgerlichen Rechts'],correct:[1,2],exp:'IT = Dienstleistung = TERTIÄRER Sektor. Privataktionäre + Dividenden = ERWERBSWIRTSCHAFTLICH!'},
+      {nr:2,q:'In einem Geldkreislaufschema steht Nummer 08 für einen Geldfluss vom Staat zu den Unternehmen. Welchem Vorgang lässt sich das zuordnen?',opts:['Zahlungen für Importe','Private Ersparnisse','Subventionen','Einkommen','Außenbeitrag'],correct:[2],exp:'Geldfluss Staat → Unternehmen = SUBVENTIONEN.'},
+      {nr:3,q:'Eine Mitarbeiterin ist schwanger. Welche Aussage zum Mutterschutzgesetz ist zutreffend? Die Arbeitnehmerin…',opts:['muss Schwangerschaft sofort mitteilen','kann Arbeitszeiten frei wählen','kann Lohnausfall in Schutzfrist geltend machen','besitzt besonderen Kündigungsschutz während und nach Entbindung','kann verlangen nach Entbindung beschäftigt zu werden'],correct:[3],exp:'Mutterschutzgesetz: Schwangere und Mütter nach Entbindung haben besonderen Kündigungsschutz!'},
+      {nr:4,q:'MÖLLER AG führt ein Einstellungsgespräch. Zu welcher Angelegenheit muss die Bewerberin KEINE Auskunft geben?',opts:['Über die Staatsangehörigkeit','Über den beruflichen Werdegang','Über den Familienstand','Über die Gewerkschaftszugehörigkeit','Über die Krankenkassenzugehörigkeit'],correct:[3],exp:'Gewerkschaftszugehörigkeit ist Privatsache — muss NICHT beantwortet werden!'},
+      {nr:5,q:'MÖLLER AG schließt Arbeitsvertrag ab. Welche Vereinbarung ist UNGÜLTIG?',opts:['Vertrag unterliegt geltenden Tarifverträgen','Mehr Urlaub als im BUrlG vorgesehen','AU-Bescheinigung am nächsten Werktag','Ausgleich für nur 16 Werktage Urlaub durch höheres Gehalt','Monatsgehalt 2.600 EUR zahlbar letzten Werktag'],correct:[3],exp:'Das BUrlG garantiert Mindesturlaub. Dieser darf NICHT durch Geld ersetzt werden!'},
+      {nr:6,q:'Herr Vieluf hat ein einfaches Arbeitszeugnis. Welche Angabe kann diesem entnommen werden?',opts:['Besondere berufsspezifische Kenntnisse','Grund des Ausscheidens','Art und Dauer der Beschäftigung','Staatsangehörigkeit','Führung und Leistung'],correct:[2],exp:'Das EINFACHE Zeugnis enthält NUR Art und Dauer der Beschäftigung!'},
+      {nr:7,q:'In welcher Angelegenheit hat der Betriebsrat laut BetrVG ein Mitbestimmungsrecht?',opts:['Rationalisierungsmaßnahmen','Stellungnahme zu ausgesprochener Kündigung','Vereinbarung zur Stellenausschreibung','AG und BR vereinbaren: tägliche Arbeitszeit um halbe Stunde verlängert','BR verlangt Auskunft über neue Zweigniederlassung'],correct:[3],exp:'Änderung der Arbeitszeiten = MITBESTIMMUNGSRECHT des Betriebsrats!'},
+      {nr:8,q:'Neue Betriebsvereinbarung: Welche Vereinbarung kann NICHT Bestandteil sein?',opts:['Rauchverbote in der Kantine','Betriebliche Altersvorsorge','Einführung flexibler Arbeitszeit','Urlaubsregelungen','Aufhebung des Kündigungsschutzes für langjährige Mitarbeiter'],correct:[4],exp:'Kündigungsschutz ist gesetzlich geregelt — kann NICHT durch Betriebsvereinbarung aufgehoben werden!'},
+      {nr:9,q:'Was bedeutet Aussperrung im Arbeitskampf?',opts:['Betriebsbesetzung durch Streikende','Außerordentliche Kündigung der organisierten AN','Gemeinsame Arbeitsniederlegung aller AN','Vorübergehende Aufhebung der Arbeitsverhältnisse durch den AG','Ordentliche Kündigung von AN'],correct:[3],exp:'Aussperrung = AG-Kampfmittel: vorübergehende Aufhebung der Arbeitsverhältnisse als Reaktion auf Streik.'},
+      {nr:10,q:'Zu welchem Zweck wurde der Europass geschaffen?',opts:['Ersetzt Reisepässe der EU','Vereinheitlichtes Dokument für Qualifikationen und Kompetenzen europaweit','Kostenlose Bahnreisen innerhalb EU','Unternehmen gründen in allen EU-Ländern','Garantiert kostenlose medizinische Versorgung in der EU'],correct:[1],exp:'Europass = einheitliches Dokument, das Qualifikationen europaweit verständlich macht!'},
+      {nr:11,q:'Welche gesetzliche Sozialversicherung wird ausschließlich vom Arbeitgeber finanziert?',opts:['Pflegeversicherung','Krankenversicherung','Rentenversicherung','Arbeitslosenversicherung','Unfallversicherung'],correct:[4],exp:'Die gesetzliche UNFALLVERSICHERUNG wird zu 100% vom Arbeitgeber getragen!'},
+      {nr:12,q:'Welche Aussage zur Berechnung der Sozialversicherungsbeiträge ist zutreffend?',opts:['Anstieg der BBG hat keine Auswirkung','Bis zur BBG wird das Arbeitsentgelt für Beiträge herangezogen','Anstieg BBG: AN muss Steuerklasse wechseln','Überschreiten BBG: Rentenversicherungspflicht endet','BBG gilt auch für Unfallversicherung'],correct:[1],exp:'Bis zur Beitragsbemessungsgrenze (BBG) wird das Bruttogehalt für SV-Beiträge herangezogen.'},
+      {nr:13,q:'ALG I nach betriebsbedingter Kündigung. Welche Aussage ist zutreffend?',opts:['Wird vom Staat zur Deckung des Grundbedarfs gezahlt','Höhe unabhängig vom letzten Einkommen','Erst nach 12 Wochen Sperrzeit','Wird nach mind. 12 Monaten sozialversicherungspflichtiger Tätigkeit gezahlt','Kein Anspruch wenn AN Vermögen besitzt'],correct:[3],exp:'ALG I: Anspruch nach mind. 12 Monaten sozialversicherungspflichtiger Tätigkeit!'},
+      {nr:14,q:'Welcher Sachverhalt entspricht dem Prinzip der Solidarität?',opts:['Staat senkt BBG für Krankenkasse','Staat fördert Selbstverantwortung bei Altersvorsorge','Einkommenssteuersatz steigt progressiv mit dem Einkommen','Kindergartenbeiträge für alle Eltern gleich','KV-Beitrag steigt mit Krankheitsrisiko'],correct:[2],exp:'Progressiver Einkommenssteuersatz = Starke zahlen mehr = Solidaritätsprinzip!'},
+      {nr:15,q:'Welcher Sachverhalt GEFÄHRDET eine private Altersvorsorge?',opts:['Niedriges Zinsniveau für Spareinlagen','Konjunkturaufschwung','Staatliche Zuschüsse zur betrieblichen Altersvorsorge','Moderate Lohnforderungen','Senkung der Rentenbeiträge'],correct:[0],exp:'Niedriges Zinsniveau = Spareinlagen bringen kaum Rendite → private Altersvorsorge schwieriger!'},
+      {nr:16,q:'Die MÖLLER AG ist börsennotiert. Welches Ziel verfolgt sie vorrangig?',opts:['Kundenzufriedenheit','Kostenmaximierung','Bestmögliche Versorgung der Bevölkerung','Gewinnmaximierung','Erhöhung der Bilanzsumme'],correct:[3],exp:'Börsennotiertes Unternehmen mit Aktionären → primäres Ziel: GEWINNMAXIMIERUNG!'},
+      {nr:17,q:'Das Leitungssystem zeigt Verbindungslinien sowohl vertikal als auch horizontal (Doppelunterstellung). Welches Leitungssystem?',opts:['Einliniensystem','Matrixsystem','Mehrliniensystem','Stabliniensystem','Abteilungssystem'],correct:[1],exp:'Doppelte Unterstellung (nach Funktion UND Projekt) = MATRIXSYSTEM!'},
+      {nr:18,q:'Welche Formel ist richtig? a) Eigenkapitalrentabilität, b) Wirtschaftlichkeit',opts:['a) EK×100/Anlagevermögen | b) Ertrag/Aufwand','a) Gewinn×100/Eigenkapital | b) Ertrag/Aufwand','a) EK×100/Gesamtkapital | b) Umsatz/EK','a) Gewinn×100/Umsatz | b) EK/Gewinn','a) Umsatz×100/EK | b) EK/Gesamtkapital'],correct:[1],exp:'EK-Rentabilität = Gewinn×100/EK. Wirtschaftlichkeit = Ertrag/Aufwand.'},
+      {nr:19,q:'MÖLLER AG und Mayer&Schulz GmbH führen gemeinsam einen Auftrag durch (Kooperationsvertrag). Welche Form der Kooperation?',opts:['Interessengemeinschaft','Arbeitsgemeinschaft (Konsortium)','Konzern','Kartell','Franchising'],correct:[1],exp:'Für einen gemeinsamen Auftrag (zeitlich begrenzt) = KONSORTIUM!'},
+      {nr:20,q:'Welche Aussage über das Handelsregister ist zutreffend?',opts:['Aufgeteilt in Abt. A (Personengesellschaften) und Abt. B (Kapitalgesellschaften)','Einsicht nur mit berechtigtem Interesse','Verzeichnis aller Kaufleute eines Amtsgerichtsbezirks','Informiert über alle Gesellschafter','Benennt rechtsgeschäftliche Vertreter aller Gesellschaften'],correct:[0],exp:'Handelsregister: Abt. A = Einzelkaufleute+Personengesellschaften. Abt. B = Kapitalgesellschaften!'},
+      {nr:21,q:'Die Bundesregierung erhöht die Lohn-/Einkommensteuer. Welche Auswirkung auf den Markt?',opts:['Nachfragekurve verschiebt sich nach rechts','Nachfragekurve verschiebt sich nach links','Angebotskurve verschiebt sich nach links','Angebotskurve verschiebt sich nach rechts','Keine Veränderungen'],correct:[1],exp:'Höhere Steuern = weniger Kaufkraft = Nachfrage sinkt = Kurve nach LINKS!'},
+      {nr:22,q:'Marktdaten: Bei 110€: NF=1800, AB=1400. Bei 120€: NF=AB=1600. Welche Aussage kann bestätigt werden?',opts:['Bei 100€: Angebotsüberhang 800 Stück','Bei 110€: Nachfrageüberhang 400 Stück','Bei 130€: Gleichgewichtsmenge 1400 Stück','Bei 140€: Angebotsüberhang 1200 Stück','Gleichgewichtspreis bei NF 1800 Stück'],correct:[1],exp:'Bei 110€: NF=1800, AB=1400 → Nachfrage übersteigt Angebot um 400 = Nachfrageüberhang 400!'},
+      {nr:23,q:'Amir Demircan ist Prokurist der Möller AG. Welches Rechtsgeschäft darf er vornehmen?',opts:['Unterzeichnung der Steuererklärung','Unterzeichnung der Bilanz','Erteilung einer Handlungsvollmacht','Auflösung der Unternehmung','Aufnahme eines neuen Gesellschafters'],correct:[1],exp:'Prokuristen können Bilanzen unterzeichnen, aber NICHT das Unternehmen auflösen!'},
+      {nr:24,q:'Welche Maßnahme dient unmittelbar dem Verbraucherschutz?',opts:['Festlegung von Mindestpreisen','Staatliche Förderung für Wohneigentum','Verpflichtung alle Waren mit Preisschildern zu versehen','Erhebung von Einfuhrzöllen','Subventionierung ertragsschwacher Betriebe'],correct:[2],exp:'Preisschilderpflicht = Verbraucher kann Preise vergleichen = Verbraucherschutz!'},
+      {nr:25,q:'Welche Maßnahme ist zur persönlichen Existenzsicherung geeignet?',opts:['Abschluss einer Garantieverlängerung für das Smartphone','Abschluss einer Berufsunfähigkeitsversicherung','Ratenkaufvertrag aufgrund fehlender Liquidität','Abschluss einer Teilkaskoversicherung','Abschluss einer privaten Zusatzkrankenversicherung'],correct:[1],exp:'Berufsunfähigkeitsversicherung sichert das Einkommen wenn man nicht mehr arbeiten kann!'},
+      {nr:26,q:'Welche Aussage zur innerbetrieblichen Arbeitsteilung ist zutreffend?',opts:['Steigert in der Regel die Produktivität','Verhindert eine Spezialisierung','Führt zu Arbeitserweiterung und Bereicherung','Führt immer zu größerer Fluktuation','Fördert durch Wiederholung geistige Fähigkeiten'],correct:[0],exp:'Innerbetriebliche Arbeitsteilung = Spezialisierung = höhere Effizienz = steigert Produktivität!'},
+      {nr:27,q:'Im Boom: Mit welcher Maßnahme kann der Staat die Konjunktur DÄMPFEN?',opts:['Senkung der Einkommenssteuersätze','Erhöhung der staatlichen Ausgaben','Subventionierung von Unternehmen','Senkung von Investitionszulagen','Senkung der Erbschaftssteuer'],correct:[3],exp:'Investitionszulagen SENKEN = weniger Investitionsanreize = Konjunktur kühlt ab!'},
+      {nr:28,q:'Welche Auswirkung hat die weltweite Arbeitsteilung?',opts:['Produktion in Ländern mit ökologisch besten Standards','Durch günstigste Produktionsbedingungen nimmt Menge transportierter Waren zu','Alle Länder halten gleiche Standards','Volkswirtschaften spezialisieren sich nicht','Allgemeine Arbeitnehmerfreizügigkeit weltweit'],correct:[1],exp:'Weltweite Arbeitsteilung: Produktion wo am günstigsten → mehr Warentransport weltweit!'},
+    ]
+  },
+  {
+    id:'s2023', title:'Sommer 2023', subtitle:'Korok-IT GmbH · 26 Aufgaben', icon:'☀️', color:'#ffd166',
+    questions:[
+      {nr:1,q:'Einstellungsgespräch bei Korok-IT GmbH. Welche Frage ist im Einstellungsgespräch ZULÄSSIG?',opts:['Was möchten Sie bei uns verdienen?','Möchten Sie in den nächsten zwei Jahren heiraten?','Gehören Sie einer politischen Partei an?','Wie hoch sind Ihre persönlichen Sparguthaben?','Welche Krankheiten haben Sie bisher gehabt?'],correct:[0],exp:'Gehaltswunsch ist zulässig! Familienplanung, Parteizugehörigkeit und Gesundheit sind UNZULÄSSIG!'},
+      {nr:2,q:'Claudio Davidson (17 Jahre alt) beginnt Ausbildung als Fachinformatiker. Welche Unterlage muss er zwingend vorlegen?',opts:['Das letzte Schulzeugnis','Die Geburtsurkunde','Teilnahmebestätigung für ein Praktikum','Notariell beglaubigte Kopie des Personalausweises','Nachweis über ärztliche Erstuntersuchung (JArbSchG)'],correct:[4],exp:'JArbSchG: Jugendliche unter 18 müssen vor Ausbildungsbeginn eine ärztliche Erstuntersuchung nachweisen!'},
+      {nr:3,q:'In den Ausbildungsverträgen ist eine Probezeit von drei Monaten. In welcher Rechtsgrundlage ist die Dauer der Probezeit geregelt?',opts:['Jugendschutzgesetz','Jugendarbeitsschutzgesetz','Berufsbildungsgesetz','Arbeitszeitgesetz','Verordnung über die Berufsausbildung'],correct:[2],exp:'Die Probezeit in Ausbildungsverträgen ist im BBiG (§20) geregelt!'},
+      {nr:4,q:'Bei welcher Maßnahme handelt es sich um eine Umschulung?',opts:['IT-System-Kauffrau besucht Ausbildereignungs-Lehrgang','Fachinformatiker bricht Ausbildung ab und beginnt als Tischler','Fachinformatikerin besucht Schulung zu IT-Sicherheit','Friseurin macht aufgrund einer Allergie zweite Berufsausbildung zur Kauffrau','Auszubildende zieht um und setzt Ausbildung woanders fort'],correct:[3],exp:'Umschulung = WECHSEL des Berufs aufgrund Notwendigkeit. Friseurin → Kauffrau = Umschulung!'},
+      {nr:5,q:'Herr Davidson verletzt sich während der Arbeitszeit. Was muss die Korok-IT GmbH als nächstes unternehmen?',opts:['Den Unfall dem TÜV melden','Den Unfall der Berufsgenossenschaft melden','Den Unfall dem Ordnungsamt melden','Herrn Davidson Verletztengeld zahlen','Herrn Davidson Schadenersatz zahlen'],correct:[1],exp:'Arbeitsunfälle müssen der BERUFSGENOSSENSCHAFT gemeldet werden!'},
+      {nr:6,q:'Beiträge zur gesetzlichen Arbeitslosenversicherung: Wer bringt diese auf?',opts:['Nur der Arbeitnehmer','Nur der Arbeitgeber','Bundesagentur für Arbeit und Arbeitgeber zu gleichen Teilen','Arbeitgeberverband und Arbeitgeber zu gleichen Teilen','Arbeitgeber und Arbeitnehmer zu gleichen Teilen'],correct:[4],exp:'Arbeitslosenversicherung: AG und AN je zur Hälfte!'},
+      {nr:7,q:'GKV-Versicherungspflichtgrenze auf 5.550 EUR/Monat. Welche Aussage trifft zu?',opts:['Auf den Teil über der Grenze wird kein Beitrag erhoben','Versicherte über der Grenze müssen die GKV verlassen','Versicherte über der Grenze können sich freiwillig in der GKV versichern','Kinder nicht mehr in GKV mitversichert','AN trägt Beiträge zu 100% selbst'],correct:[2],exp:'Wer über der Versicherungspflichtgrenze verdient KANN die GKV verlassen — muss aber nicht!'},
+      {nr:8,q:'Herr Davidson erhält 50 EUR mehr/Monat, aber Preise stiegen stark. Welches Einkommen ist gesunken?',opts:['Bruttoeinkommen','Zu versteuerndes Einkommen','Realeinkommen','Nettoeinkommen','Nominaleinkommen'],correct:[2],exp:'Realeinkommen = Kaufkraft! Mehr Geld aber höhere Preise = Realeinkommen gesunken!'},
+      {nr:9,q:'In welchem Gesetz werden Betriebsversammlungen geregelt?',opts:['Bürgerliches Gesetzbuch','Berufsbildungsgesetz','Tarifvertragsgesetz','Betriebsverfassungsgesetz','Arbeitsschutzgesetz'],correct:[3],exp:'Betriebsversammlungen sind im BetrVG (Betriebsverfassungsgesetz) geregelt!'},
+      {nr:10,q:'Herr Davidson nimmt an der Betriebsversammlung während der Arbeitszeit teil. Welche Folge ergibt sich?',opts:['Muss ausgefallene Arbeitszeit nachholen','Darf nur teilnehmen wenn seit 6 Monaten beschäftigt','Darf nur teilnehmen wenn Gewerkschaftsmitglied','Teilnahme gilt als Arbeitszeit und wird vergütet','Gilt als Arbeitszeit nur wenn genehmigt'],correct:[3],exp:'Betriebsversammlungen während der Arbeitszeit = gilt als Arbeitszeit und wird voll bezahlt!'},
+      {nr:11,q:'In welchem Fall hat der Betriebsrat ein Mitbestimmungsrecht?',opts:['Eine neue Mitarbeiterin kündigt in der Probezeit','Korok-IT möchte die tägliche Arbeitszeit von 8 auf 10 Stunden ändern','Gesetzlicher Mindestlohn wird erhöht','Auszubildender hat Prüfung nicht bestanden','Auszubildende möchte zu anderem Arbeitgeber wechseln'],correct:[1],exp:'Änderung der Arbeitszeiten = MITBESTIMMUNGSRECHT des Betriebsrats (§87 BetrVG)!'},
+      {nr:12,q:'Welche Aussage trifft auf die Rechtsform der KG zu?',opts:['Alle Gesellschafter haften unbeschränkt','Mindesteinlage der Gesellschafter beträgt 25.000 EUR','Komplementäre haften nicht für Verluste','Kommanditisten haften maximal in Höhe ihrer Einlage','Kommanditisten sind zur Geschäftsführung verpflichtet'],correct:[3],exp:'KG: Komplementär haftet unbeschränkt. KOMMANDITIST haftet nur bis zur Höhe seiner EINLAGE!'},
+      {nr:13,q:'Welcher Gesichtspunkt spielt bei der Standortwahl KEINE Rolle?',opts:['Anzahl und Größe der Konkurrenzbetriebe','Aktuelle Umsatzsteuersätze','Behördliche Auflagen (Bau- und Umweltvorschriften)','Verkehrsanbindung für Kunden und Lieferanten','Höhe der Kosten für Miete/Pacht'],correct:[1],exp:'Umsatzsteuersätze sind bundesweit gleich → kein Standortfaktor!'},
+      {nr:14,q:'Schmitz-IT GmbH: Erika Schmitz ist einzige Gesellschafterin. Welche Regelung zur gesetzlichen Haftung ist zutreffend?',opts:['Haftung maximal 25.000 EUR','Haftet nur bei grober Pflichtverletzung','Die GmbH haftet mit ihrem Gesellschaftsvermögen','Frau Schmitz haftet nur mit Privatvermögen','Frau Schmitz haftet zusätzlich zu ihrer Einlage mit Privatvermögen'],correct:[2],exp:'GmbH-Haftung: Nur das GESELLSCHAFTSVERMÖGEN haftet. Frau Schmitz persönlich haftet NICHT!'},
+      {nr:15,q:'Welche Aussage über die Aufgaben der IHK trifft zu?',opts:['IHK führt das Handelsregister','IHK überprüft die Bilanzen der Unternehmen','IHK unterstützt Arbeitgeber bei der Suche nach Fachkräften','IHK legt die Gewerbesteuer fest','IHK muss in Arbeitsgerichtsverfahren angehört werden'],correct:[2],exp:'IHK: Beratung, Aus- und Weiterbildung. Handelsregister = Amtsgericht!'},
+      {nr:16,q:'Susanne Becker (seit 01.05.2022) reicht am 24.04.2023 Kündigung ein zum 30.04.2023. Ist die Kündigung wirksam?',opts:['Wirksam, da schriftlich gekündigt','Wirksam, da sie schon neuen Job hat','Unwirksam — Kündigungsfrist (4 Wochen zum 15. oder Monatsende) nicht eingehalten','Unwirksam — muss 2 Monate einhalten','Unwirksam — ohne Zustimmung der IHK'],correct:[2],exp:'AN-Kündigung: 4 Wochen zum 15. oder Monatsende. 24.04+4W=22.05 → frühestens 31.05. Nicht 30.04!'},
+      {nr:17,q:'Korok-IT möchte Hans Baumgart (38J.) betriebsbedingt kündigen. Welche Aussage zu den Kündigungsmodalitäten ist zutreffend?',opts:['BR muss gehört werden. Hält er Kündigung für ungerechtfertigt, darf AG NICHT kündigen','BR muss gehört werden. Baumgart kann innerhalb 3 Wochen Klage einreichen','BR muss nicht angehört werden','Mit BR-Zustimmung kann Frist kürzer ausfallen','Betriebsbedingte Kündigungen sind immer gültig'],correct:[1],exp:'BR muss angehört werden (§102 BetrVG). AG kann trotzdem kündigen. AN hat 3 Wochen für Klage!'},
+      {nr:18,q:'Frau Fürst ist mit ihrem Arbeitszeugnis nicht einverstanden. An welches Gericht muss sie sich wenden?',opts:['Arbeitsgericht','Verwaltungsgericht','Amtsgericht','Sozialgericht','Finanzgericht'],correct:[0],exp:'Streitigkeiten aus dem Arbeitsverhältnis (wie Zeugnis) → ARBEITSGERICHT!'},
+      {nr:19,q:'Die Grothe AG bietet IT-Dienstleistungen an. Aktionäre sind Privatpersonen, die Dividenden erwarten. Welche ZWEI Angaben treffen zu?',opts:['Unternehmen des primären Sektors','Unternehmen des tertiären Sektors','Erwerbswirtschaftliches Unternehmen','Gemeinwirtschaftliches Unternehmen','Personengesellschaft','Gesellschaft bürgerlichen Rechts'],correct:[1,2],exp:'IT-Dienstleistung = TERTIÄRER Sektor. Privataktionäre + Dividenden = ERWERBSWIRTSCHAFTLICH!'},
+      {nr:20,q:'Die Grothe AG ist börsennotiert. Welches Ziel verfolgt sie vorrangig?',opts:['Kundenzufriedenheit','Kostenmaximierung','Bestmögliche Versorgung der Bevölkerung','Gewinnmaximierung','Bilanzverlängerung'],correct:[3],exp:'Börsennotiertes Unternehmen mit Aktionären → primäres Ziel: GEWINNMAXIMIERUNG!'},
+      {nr:21,q:'Welchen Grundsatz sollte Korok-IT beim Umweltschutz bei Verpackungen berücksichtigen?',opts:['Papierverpackungen sind immer umweltfreundlich','Vermeidung unnötiger Verpackung ist besser als ihre Entsorgung','Recycelte Plastikverpackungen sind immer umweltfreundlich','Verpackung muss wiederverschließbar sein','Verpackung gehört grob gereinigt in den Restmüll'],correct:[1],exp:'Umweltschutz-Hierarchie: Erst VERMEIDEN, dann Reduzieren, dann Recyceln!'},
+      {nr:22,q:'Korok-IT verwendet Kopierpapier mit Blauem Engel. Wie unterstützt das den Umweltschutz?',opts:['Reduzierung des Kopierpapierverbrauchs','Einsparung von Energie','Reduzierung der Kosten','Bessere Qualität des Papiers','Einsparung von Rohstoffen für die Papiererzeugung'],correct:[4],exp:'Blauer Engel = rohstoffschonendes Produktionsverfahren → ROHSTOFFEINSPARUNG!'},
+      {nr:23,q:'Die Konjunktur befindet sich in einer Rezession. An welchem Merkmal lässt sich das erkennen?',opts:['Zahl der Arbeitslosen sinkt','Tarifparteien einigen sich auf deutlich höhere Löhne','Güternachfrage und Produktion steigen','Verbraucherpreise steigen stark','Die Nachfrage nach Konsumgütern geht stark zurück'],correct:[4],exp:'Rezession = Abschwung: weniger Nachfrage, weniger Produktion, mehr Arbeitslose!'},
+      {nr:24,q:'Herr Davidson muss Tätigkeiten verrichten, die laut Ausbildungsplan nicht vorgesehen sind. Welche Stelle ist zuständig?',opts:['Berufsgenossenschaft','Industrie- und Handelskammer','Gewerbeaufsichtsbehörde','Berufsberatung','Gesundheitsamt'],correct:[1],exp:'Die IHK (Industrie- und Handelskammer) ist für die betriebliche Ausbildung zuständig!'},
+      {nr:25,q:'Welche Aussage trifft auf das AGG zu?',opts:['Das AGG gilt nicht für Auszubildende','Bei Verstoß kein Anspruch auf Schadenersatz','AGG erschwert Einstellung aus Nicht-EU-Ländern','Stellen müssen zwingend geschlechtsneutral ausgeschrieben werden','Benachteiligungsverbote gelten nicht für Arbeitsbedingungen'],correct:[3],exp:'AGG §11: Stellen müssen GESCHLECHTSNEUTRAL ausgeschrieben werden (m/w/d)!'},
+      {nr:26,q:'In welchem Fall wurden die Regeln gegen sachfremde Bevorzugung BEACHTET?',opts:['Conny Toyson eingestellt weil sie Nichte des GF ist','Henriette Schmitz wegen Hautfarbe bevorzugt','Andreas Brandtner nicht aufgenommen weil offen homosexuell','Sandro Müller wegen fehlender Qualifikation nicht aufgenommen','Angelika Corleone wegen Religionszugehörigkeit nicht berücksichtigt'],correct:[3],exp:'Ablehnung wegen fehlender QUALIFIKATION ist ein legaler Grund — kein AGG-Verstoß!'},
+    ]
+  }
+];
+
+// ============================================================
+// EXAM STATE
+// ============================================================
+let eCurrentExam = null;
+let eQuizQuestions = [];
+let eCurrentQ = 0;
+let eScore = 0;
+let eWrongAnswers = [];
+let eSelectedAnswers = [];
+let eAnswered = false;
+
+function renderExamList() {
+  const c = document.getElementById('examListContainer');
+  c.innerHTML = EXAMS.map(e => `
+    <div class="exam-card" onclick="startExam('${e.id}')">
+      <div class="exam-icon" style="background:${e.color}22;">${e.icon}</div>
+      <div class="exam-info">
+        <div class="exam-title">${e.title}</div>
+        <div class="exam-meta">${e.subtitle}</div>
+      </div>
+      <div class="exam-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function startExam(examId) {
+  eCurrentExam = EXAMS.find(e => e.id === examId);
+  if (!eCurrentExam) return;
+  eQuizQuestions = eCurrentExam.questions;
+  eCurrentQ = 0; eScore = 0; eWrongAnswers = []; eAnswered = false; eSelectedAnswers = [];
+  showScreen('exam-quiz');
+  eRenderQuestion();
+}
+
+function eRenderQuestion() {
+  if (eCurrentQ >= eQuizQuestions.length) { eShowResults(); return; }
+  const q = eQuizQuestions[eCurrentQ];
+  const total = eQuizQuestions.length;
+  eAnswered = false; eSelectedAnswers = [];
+
+  document.getElementById('eProgressFill').style.width = (eCurrentQ / total * 100) + '%';
+  document.getElementById('eQuizCounter').textContent = 'Aufgabe ' + (eCurrentQ+1) + ' / ' + total;
+  document.getElementById('eScoreDisplay').textContent = '✓ ' + eScore;
+  document.getElementById('eQSource').textContent = '📄 ' + eCurrentExam.title + ' · Aufgabe ' + q.nr;
+  document.getElementById('eQText').textContent = q.q;
+
+  const isMulti = q.correct.length > 1;
+  document.getElementById('eMultiHint').style.display = isMulti ? 'block' : 'none';
+  const cb = document.getElementById('eConfirmMultiBtn');
+  cb.style.display = '';
+  cb.className = 'confirm-multi-btn' + (isMulti ? ' show' : '');
+
+  const letters = ['A','B','C','D','E','F'];
+  document.getElementById('eOptionsContainer').innerHTML = q.opts.map((opt, i) => `
+    <button class="option-btn" id="eopt${i}" onclick="${isMulti ? 'eToggleMulti('+i+')' : 'eSelectAnswer('+i+')'}">
+      <div class="option-letter">${letters[i]}</div><div>${opt}</div>
+    </button>
+  `).join('');
+
+  document.getElementById('eFeedbackBox').className = 'feedback-box';
+  document.getElementById('eNextBtn').className = 'next-btn';
+}
+
+function eSelectAnswer(idx) {
+  if (eAnswered) return;
+  eAnswered = true;
+  const q = eQuizQuestions[eCurrentQ];
+  const isCorrect = q.correct.includes(idx);
+  document.querySelectorAll('#eOptionsContainer .option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.correct.includes(i)) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+  eShowFeedback(isCorrect, q);
+}
+
+function eToggleMulti(idx) {
+  if (eAnswered) return;
+  const btn = document.getElementById('eopt' + idx);
+  if (eSelectedAnswers.includes(idx)) {
+    eSelectedAnswers = eSelectedAnswers.filter(x => x !== idx);
+    btn.classList.remove('selected');
+  } else {
+    eSelectedAnswers.push(idx);
+    btn.classList.add('selected');
+  }
+}
+
+function eCheckMultiAnswer() {
+  if (eAnswered || eSelectedAnswers.length === 0) return;
+  eAnswered = true;
+  const q = eQuizQuestions[eCurrentQ];
+  const isCorrect = JSON.stringify(eSelectedAnswers.sort()) === JSON.stringify([...q.correct].sort());
+  document.querySelectorAll('#eOptionsContainer .option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.correct.includes(i)) btn.classList.add('correct');
+    else if (eSelectedAnswers.includes(i) && !q.correct.includes(i)) btn.classList.add('wrong');
+  });
+  document.getElementById('eConfirmMultiBtn').style.display = 'none';
+  eShowFeedback(isCorrect, q);
+}
+
+function eShowFeedback(isCorrect, q) {
+  if (isCorrect) eScore++;
+  else eWrongAnswers.push({nr:q.nr, q:q.q.substring(0,80)+'...', correct:q.opts[q.correct[0]]});
+  document.getElementById('eScoreDisplay').textContent = '✓ ' + eScore;
+  const fb = document.getElementById('eFeedbackBox');
+  fb.className = 'feedback-box show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  document.getElementById('eFeedbackTitle').textContent = isCorrect ? '✅ Richtig!' : '❌ Falsch!';
+  document.getElementById('eFeedbackText').textContent = q.exp;
+  document.getElementById('eNextBtn').className = 'next-btn show';
+}
+
+function eNextQuestion() { eCurrentQ++; eRenderQuestion(); }
+
+function eShowResults() {
+  showScreen('exam-results');
+  const total = eQuizQuestions.length;
+  const pct = Math.round(eScore / total * 100);
+  document.getElementById('eResultPercent').textContent = pct + '%';
+  document.getElementById('eResultSub').textContent = eScore + ' / ' + total + ' richtig';
+  document.getElementById('eResultMessage').textContent = pct >= 80 ? '🎉 Bestanden! Sehr gut!' : pct >= 60 ? '👍 Fast! Wiederhole die falschen Aufgaben.' : '💪 Weiter üben! Du schaffst das!';
+  const wl = document.getElementById('eWrongList');
+  const wt = document.getElementById('eWrongTitle');
+  const rb = document.getElementById('eRetryBtn');
+  if (eWrongAnswers.length > 0) {
+    wt.style.display = 'block'; rb.style.display = 'block';
+    wl.innerHTML = eWrongAnswers.map(w => `<div class="wrong-item"><div class="wrong-item-q">❓ Aufg.${w.nr}: ${w.q}</div><div class="wrong-item-a">✓ ${w.correct}</div></div>`).join('');
+  } else {
+    wt.style.display = 'none'; rb.style.display = 'none';
+    wl.innerHTML = '<div style="color:var(--green);font-size:14px;text-align:center;">🎯 Alle Aufgaben richtig!</div>';
+  }
+}
+
+function eRetryWrong() {
+  if (eWrongAnswers.length === 0) return;
+  const wrongNrs = eWrongAnswers.map(w => w.nr);
+  eQuizQuestions = eCurrentExam.questions.filter(q => wrongNrs.includes(q.nr));
+  eCurrentQ = 0; eScore = 0; eWrongAnswers = [];
+  showScreen('exam-quiz'); eRenderQuestion();
+}
+
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  currentScreen = id;
+  if (id === 'study') renderStudy();
+  if (id === 'filter') renderFilters();
+  if (id === 'exam-list') renderExamList();
+}
+
+// ============================================================
+// STUDY
+// ============================================================
+
+function renderStudy() {
+  const grid = document.getElementById('topicGrid');
+  grid.innerHTML = TOPICS.map((t, i) => `
+    <div class="topic-card" id="tc${i}" onclick="toggleTopic(${i})">
+      <div class="topic-header">
+        <div class="topic-icon" style="background:${t.color}22;">${t.icon}</div>
+        <div class="topic-name">${t.name}</div>
+        <div class="topic-chevron">▾</div>
+      </div>
+      <div class="topic-body">
+        ${t.facts.map(f => `
+          <div class="fact-item">
+            <div class="fact-dot"></div>
+            <div><span class="fact-key">${f.key}:</span> ${f.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTopic(i) {
+  const card = document.getElementById('tc' + i);
+  card.classList.toggle('open');
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+
+function renderFilters() {
+  const container = document.getElementById('filterChips');
+  selectedFilters = [...new Set(QUESTIONS.map(q => q.topic))];
+  container.innerHTML = TOPICS.map(t => `
+    <div class="filter-chip active" id="chip_${t.id}" onclick="toggleFilter('${t.id}')">${t.icon} ${t.name.split('—')[0].trim()}</div>
+  `).join('');
+}
+
+function toggleFilter(id) {
+  const chip = document.getElementById('chip_' + id);
+  if (selectedFilters.includes(id)) {
+    if (selectedFilters.length === 1) return;
+    selectedFilters = selectedFilters.filter(x => x !== id);
+    chip.classList.remove('active');
+  } else {
+    selectedFilters.push(id);
+    chip.classList.add('active');
+  }
+}
+
+function startFilteredQuiz() {
+  const filtered = QUESTIONS.filter(q => selectedFilters.includes(q.topic));
+  if (filtered.length === 0) return;
+  startQuizWithQuestions(shuffle([...filtered]));
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz(mode) {
+  const qs = mode === 'wrong' ? wrongAnswers.map(w => QUESTIONS.find(q => q.id === w.id)).filter(Boolean) : shuffle([...QUESTIONS]);
+  startQuizWithQuestions(qs);
+}
+
+function startQuizWithQuestions(qs) {
+  quizQuestions = qs;
+  currentQ = 0;
+  score = 0;
+  wrongAnswers = [];
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (currentQ >= quizQuestions.length) { showResults(); return; }
+  const q = quizQuestions[currentQ];
+  const total = quizQuestions.length;
+  answered = false;
+  selectedAnswers = [];
+
+  document.getElementById('progressFill').style.width = (currentQ / total * 100) + '%';
+  document.getElementById('quizCounter').textContent = `Frage ${currentQ + 1} / ${total}`;
+  document.getElementById('scoreDisplay').textContent = `✓ ${score}`;
+  document.getElementById('qSource').textContent = `📄 ${q.src} · ${TOPICS.find(t=>t.id===q.topic)?.name.split('—')[0] || ''}`;
+  document.getElementById('qText').textContent = q.q;
+
+  const isMulti = q.correct.length > 1;
+  document.getElementById('multiHint').style.display = isMulti ? 'block' : 'none';
+  document.getElementById('confirmMultiBtn').className = 'confirm-multi-btn' + (isMulti ? ' show' : '');
+
+  const opts = document.getElementById('optionsContainer');
+  const letters = ['A','B','C','D','E','F'];
+  opts.innerHTML = q.opts.map((opt, i) => `
+    <button class="option-btn" id="opt${i}" onclick="${isMulti ? `toggleMulti(${i})` : `selectAnswer(${i})`}">
+      <div class="option-letter">${letters[i]}</div>
+      <div>${opt}</div>
+    </button>
+  `).join('');
+
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('nextBtn').className = 'next-btn';
+
+  if (!isMulti) document.getElementById('confirmMultiBtn').style.display = 'none';
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizQuestions[currentQ];
+  const isCorrect = q.correct.includes(idx);
+
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.correct.includes(i)) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  showFeedback(isCorrect, q);
+}
+
+function toggleMulti(idx) {
+  if (answered) return;
+  const btn = document.getElementById('opt' + idx);
+  if (selectedAnswers.includes(idx)) {
+    selectedAnswers = selectedAnswers.filter(x => x !== idx);
+    btn.classList.remove('selected');
+  } else {
+    selectedAnswers.push(idx);
+    btn.classList.add('selected');
+  }
+}
+
+function checkMultiAnswer() {
+  if (answered || selectedAnswers.length === 0) return;
+  answered = true;
+  const q = quizQuestions[currentQ];
+  const isCorrect = JSON.stringify(selectedAnswers.sort()) === JSON.stringify([...q.correct].sort());
+
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.correct.includes(i)) btn.classList.add('correct');
+    else if (selectedAnswers.includes(i) && !q.correct.includes(i)) btn.classList.add('wrong');
+  });
+
+  document.getElementById('confirmMultiBtn').style.display = 'none';
+  showFeedback(isCorrect, q);
+}
+
+function showFeedback(isCorrect, q) {
+  if (isCorrect) {
+    score++;
+  } else {
+    wrongAnswers.push({ id: q.id, q: q.q.substring(0, 80) + '...', correct: q.opts[q.correct[0]] });
+  }
+
+  document.getElementById('scoreDisplay').textContent = `✓ ${score}`;
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  document.getElementById('feedbackTitle').textContent = isCorrect ? '✅ Richtig!' : '❌ Falsch!';
+  document.getElementById('feedbackText').textContent = q.exp;
+  document.getElementById('nextBtn').className = 'next-btn show';
+}
+
+function nextQuestion() {
+  currentQ++;
+  renderQuestion();
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+
+function showResults() {
+  showScreen('results');
+  const total = quizQuestions.length;
+  const pct = Math.round(score / total * 100);
+  document.getElementById('resultPercent').textContent = pct + '%';
+  document.getElementById('resultSub').textContent = score + ' / ' + total + ' richtig';
+
+  let msg = '';
+  if (pct >= 80) msg = '🎉 Ausgezeichnet! Du bist bereit für die Prüfung!';
+  else if (pct >= 60) msg = '👍 Gut gemacht! Wiederhole die falschen Antworten.';
+  else msg = '💪 Weiter üben! Konzentriere dich auf die roten Themen.';
+
+  document.getElementById('resultMessage').textContent = msg;
+
+  const wrongList = document.getElementById('wrongList');
+  const wrongTitle = document.getElementById('wrongTitle');
+  const retryBtn = document.getElementById('retryBtn');
+
+  if (wrongAnswers.length > 0) {
+    wrongTitle.style.display = 'block';
+    retryBtn.style.display = 'block';
+    wrongList.innerHTML = wrongAnswers.map(w => `
+      <div class="wrong-item">
+        <div class="wrong-item-q">❓ ${w.q}</div>
+        <div class="wrong-item-a">✓ ${w.correct}</div>
+      </div>
+    `).join('');
+  } else {
+    wrongTitle.style.display = 'none';
+    retryBtn.style.display = 'none';
+    wrongList.innerHTML = '<div style="color:var(--green);font-size:14px;text-align:center;">🎯 Alle Fragen richtig! Perfekt!</div>';
+  }
+}
+
+function retryWrong() {
+  if (wrongAnswers.length === 0) return;
+  startQuiz('wrong');
+}
+
+// Start
+showScreen('home');
+</script>
+</body>
+</html>
